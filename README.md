@@ -1,6 +1,8 @@
 # AdvancedObjectDetection
 
- <img src="./images/vlp-viz.gif" height="300" width="300">
- <img src="./images/2d-obj-detect.gif" height="275" width="640">
+ 
+ Velodyne Point Cloud      |  2D Object Detection
+:-------------------------:|:-------------------------:
+![](./images/vlp-viz.gif)  |  ![](./images/2d-obj-detect.gif)
  
 
