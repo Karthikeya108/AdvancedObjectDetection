@@ -1,3 +1,12 @@
+'''
+PLEASE NOTE:
+Reference:
+    This implementation is based on the following paper:
+        + https://pjreddie.com/media/files/papers/YOLO9000.pdf
+    And following GitHub project:
+        + https://github.com/experiencor/keras-yolo2
+'''
+
 import numpy as np
 import os
 import xml.etree.ElementTree as ET

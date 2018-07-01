@@ -1,3 +1,12 @@
+'''
+PLEASE NOTE:
+Reference:
+    This implementation is based on the following paper:
+        + https://pjreddie.com/media/files/papers/YOLO9000.pdf
+    And following GitHub project:
+        + https://github.com/experiencor/keras-yolo2
+'''
+
 from keras.models import Sequential, Model
 from keras.layers import Reshape, Activation, Conv2D, Input, MaxPooling2D, BatchNormalization, Flatten, Dense, Lambda
 from keras.layers.advanced_activations import LeakyReLU
@@ -72,5 +81,5 @@ class ObjectDetector:
 
         image = draw_boxes(image, boxes, labels=self.yoloModelObj.LABELS)
         
-        return image, boxes, self.yoloModelObj.LABELS
+        return image, boxes,
     
