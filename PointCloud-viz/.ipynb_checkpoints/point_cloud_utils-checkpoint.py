@@ -1,5 +1,7 @@
 '''
 Reference:
+    Some of the concepts are explained in the following paper:
+        + https://arxiv.org/pdf/1608.07916.pdf
     This implementation is based on the following GitHub project:
         + https://github.com/VincentCheungM/lidar_projection
 '''
@@ -17,7 +19,7 @@ class PointCloudVisualizer():
         self.HORIZONTAL_RANGE = (-10, 10)
         self.VERTICAL_RANGE = (-10,10)
     
-    def visualize_point_cloud(self, points, saveto=None, figsize=None):
+    def projection_bird_view_spectral(self, points, saveto=None, figsize=None):
         """ Creates an 2D birds eye view representation of the point cloud data with spectral mapping based on height
 
         Args:
@@ -76,8 +78,81 @@ class PointCloudVisualizer():
             Optionally specify the data type of the output (default is uint8)
         """
         return (((a - min) / float(max - min)) * 255).astype(dtype)
+    
+    def projection_birds_eye_multiple_channels(self,
+                                points,
+                                n_slices=8,
+                                height_range=(-2.73, 1.27),
+                                resolution=0.1,
+                                ):
+        """ Creates an array that is a birds eye view representation of the
+            reflectance values in the point cloud data, separated into different
+            height slices.
 
-    def birds_eye_point_cloud(self,
+        Args:
+            points:     (numpy array)
+                        Nx4 array of the points cloud data.
+                        N rows of points. Each point represented as 4 values,
+                        x,y,z, reflectance
+            n_slices :  (int)
+                        Number of height slices to use.
+            height_range: (tuple of two floats)
+                        (min, max) heights (in metres) relative to the sensor.
+                        The slices calculated will be within this range, plus
+                        two additional slices for clipping all values below the
+                        min, and all values above the max.
+                        Default is set to (-2.73, 1.27), which corresponds to a
+                        range of -1m to 3m above a flat road surface given the
+                        configuration of the sensor in the Kitti dataset.
+            resolution: (float) desired resolution in metres to use
+                        Each output pixel will represent an square region res x res
+                        in size along the front and side plane.
+        """
+        x_points = points[:, 0]
+        y_points = points[:, 1]
+        z_points = points[:, 2]
+        r_points = points[:, 3]  # Reflectance
+
+        # FILTER INDICES - of only the points within the desired rectangle
+        # Note left side is positive y axis in LIDAR coordinates
+        ff = np.logical_and((x_points > self.VERTICAL_RANGE[0]), (x_points < self.VERTICAL_RANGE[1]))
+        ss = np.logical_and((y_points > -self.HORIZONTAL_RANGE[1]), (y_points < -self.HORIZONTAL_RANGE[0]))
+        indices = np.argwhere(np.logical_and(ff, ss)).flatten()
+
+        # KEEPERS - The actual points that are within the desired  rectangle
+        y_points = y_points[indices]
+        x_points = x_points[indices]
+        z_points = z_points[indices]
+        r_points = r_points[indices]
+
+        # CONVERT TO PIXEL POSITION VALUES - Based on resolution
+        x_img = (-y_points / resolution).astype(np.int32) # x axis is -y in LIDAR
+        y_img = (x_points / resolution).astype(np.int32)  # y axis is -x in LIDAR
+                                                   # direction to be inverted later
+        # SHIFT PIXELS TO HAVE MINIMUM BE (0,0)
+        # floor used to prevent issues with -ve vals rounding upwards
+        x_img -= int(np.floor(self.HORIZONTAL_RANGE[0] / resolution))
+        y_img -= int(np.floor(self.VERTICAL_RANGE[0] / resolution))
+
+        # ASSIGN EACH POINT TO A HEIGHT SLICE
+        # n_slices-1 is used because values above max_height get assigned to an
+        # extra index when we call np.digitize().
+        bins = np.linspace(height_range[0], height_range[1], num=n_slices-1)
+        slice_indices = np.digitize(z_points, bins=bins, right=False)
+
+        # RESCALE THE REFLECTANCE VALUES - to be between the range 0-255
+        pixel_values = self.scale_to_255(r_points, min=0.0, max=1.0)
+
+        # FILL PIXEL VALUES IN IMAGE ARRAY
+        # -y is used because images start from top left
+        x_max = int((self.HORIZONTAL_RANGE[1] - self.HORIZONTAL_RANGE[0]) / resolution)
+        y_max = int((self.VERTICAL_RANGE[1] - self.VERTICAL_RANGE[0]) / resolution)
+        im = np.zeros([y_max, x_max, n_slices], dtype=np.uint8)
+        im[-y_img, x_img, slice_indices] = pixel_values
+
+        return im
+
+    def projection_bird_view(self,
                               points,
                               resolution=0.1,
                               min_height = -2.73,
@@ -152,7 +227,7 @@ class PointCloudVisualizer():
         return im
 
 
-    def lidar_to_2d_front_view(self,
+    def projection_front_view(self,
                                points,
                                v_res,
                                h_res,
