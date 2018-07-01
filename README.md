@@ -36,7 +36,7 @@ The processed datasets can be downloaded from the following link:
 
 http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d
 
-The dataset can be used to detect various objects in the street while driving in a city. Namely, other vehicles, pedestrains, cyclists, traffic light etc.
+The dataset can be used to detect various objects in the street while driving in a city. Namely, other vehicles, pedestrains, cyclists, traffic light etc. The dataset also provides labels in the form of 3d bounding boxes for the training dataset, which one can use for training a model.
 
 ### **Camera image processing and 2D object detection**
 
@@ -56,7 +56,7 @@ YOLOv2 technique is a state of the art technique for 2D object detection and can
 
 The `gif` file added at the begining of this document is also a result of this model. As you can see, the object detector not only detects other `cars`, but also detects a `person`, `traffic light`, `bicycle` etc.
 
-My next goal is to build a 3D object detection model to this dataset. For this I also need the depth information which is not available in the images. 
+My goal is to build a 3D object detection model using this dataset. For this I also need the depth information which is not available in the images. 
 
 ### **Feature extraction and visualization of lidar point clouds**
 
@@ -87,16 +87,24 @@ The lidar coordinates are different from that of camera images. Following image 
 <img src="./images/axes.png">
 
 This means that `X` axis actually represents the depth in lidar points.
+  
 
 #### Lidar point cloud - Bird view projection
 
 We need to pre-process the lidar point cloud data to be used for training a neural network model. One way is to project the point cloud data on a 2-dimensional plane to obtain a `Bird's eye view`.
 
-[Chen et al 2016](https://arxiv.org/abs/1611.07759) provides a technique to project the lidar point cloud data onto 2-dimensional plane and then slice the regions based on height into multiple channels. Applying this technique returns the following result:
+Coordinate mappings for projection:
+
+ Lidar axes     |  Camera axes
+:-------------------------:|:-------------------------:
+ -Y | X
+  X | Y
+
+[Chen et al 2016](https://arxiv.org/abs/1611.07759) provides a technique to project the lidar point cloud data onto 2-dimensional plane and then slice the regions based on height into multiple channels. Applying this technique (with 6 slices) returns the following result:
 
 <img src="./images/bird_view_multichannel.png">
 
-Since Convolutional Neural Network models has no problems in consuming mulitple channels of an image, this technique is quite practical as shown in the [Chen et al 2016](https://arxiv.org/abs/1611.07759) paper.
+Since Convolutional Neural Network models have no problems in consuming data in mulitple channels, this technique is quite practical, as shown in the [Chen et al 2016](https://arxiv.org/abs/1611.07759) paper.
 
 The bird's eye view without slicing looks like:
 
@@ -144,10 +152,18 @@ Following is the result of projecting the lidar point cloud to front view using 
 <img src="./images/frontview_reflectance.png" height="200" width="1000">
 
 
-One can find the implementation in the `python` source files and `ipynb` files
+One can find the implementation in the `python` source files and `ipynb` files.
+
+Next steps:
+
+    1. Develop a deep learning model to train an 3d object detector using only the point cloud dataset and project the bounding boxes on camera images.
+    2. Develop a deep learning model to train an 3d object detector with features extracted from both images and lidar point cloud.
 
 
 References:
+
+    Title: Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite
+    Authors: Andreas Geiger and Philip Lenz and Raquel Urtasun
 
     Title: Vehicle Detection from 3D Lidar Using Fully Convolutional Network
     Authors: Bo Li, Tianlei Zhang and Tian Xia
@@ -158,9 +174,13 @@ References:
     Title: YOLO9000: Better, Faster, Stronger
     Authors: Joseph Redmon, Ali Farhadi
     
+    http://www.cvlibs.net/datasets/kitti/index.php
+    
     https://github.com/experiencor/keras-yolo2
     
     https://github.com/VincentCheungM/lidar_projection
+    
+    http://velodynelidar.com/hdl-64e.html
 
 
 
