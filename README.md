@@ -106,7 +106,7 @@ The bird's eye view without slicing looks like:
 
 Another way to use the point cloud data for object detection is to project the 3-dimensional point cloud to a 2-dimensional front view. In order to do that, first step is to project the lidar points onto a cylindrical surface and then flatten the surface. [Li et al. 2016](https://arxiv.org/abs/1608.07916) provides a technique to achieve this. 
 
-Based on the Velodyne Lidar specs mentioned above, we can project the points as follows:
+Based on the Velodyne Lidar specs mentioned above, we can compute the project coordinates as follows:
 ```
 # Resolution and Field of View of LIDAR sensor
 HRES ==  0.35                  # horizontal resolution (assuming 20Hz setting)
@@ -131,15 +131,15 @@ x_img = np.arctan2(-y_lidar, x_lidar)/ h_res_rad
 y_img = np.arctan2(z_lidar, d_lidar)/ v_res_rad
 ```
 
-Following is the result of projecting the lidar point cloud to front view using depth
+Following is the result of projecting the lidar point cloud to front view using `depth`
 
 <img src="./images/frontview_depth.png" height="200" width="1000">
 
-Following is the result of projecting the lidar point cloud to front view using height
+Following is the result of projecting the lidar point cloud to front view using `height`
 
 <img src="./images/frontview_height.png" height="200" width="1000">
 
-Following is the result of projecting the lidar point cloud to front view using reflectance value
+Following is the result of projecting the lidar point cloud to front view using `reflectance`
 
 <img src="./images/frontview_reflectance.png" height="200" width="1000">
 
