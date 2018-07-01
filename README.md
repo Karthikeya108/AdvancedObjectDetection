@@ -6,7 +6,7 @@
 ![](./images/vlp-viz.gif)  |  ![](./images/2d-obj-detect.gif)
  
 
-**Velodyne point cloud front view reflectance projectioin**
+**Velodyne point cloud front view reflectance projection**
 
 <img src="./images/vlp-viz-pro-gif.gif" height="200" width="1000">
 
@@ -150,9 +150,6 @@ Following is the result of projecting the lidar point cloud to front view using 
 Following is the result of projecting the lidar point cloud to front view using `reflectance`
 
 <img src="./images/frontview_reflectance.png" height="200" width="1000">
-
-
-One can find the implementation in the `python` source files and `ipynb` files.
 
 Next steps:
 
