@@ -1,5 +1,4 @@
 '''
-PLEASE NOTE:
 Reference:
     This implementation is based on the following paper:
         + https://pjreddie.com/media/files/papers/YOLO9000.pdf
